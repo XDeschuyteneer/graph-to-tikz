@@ -172,7 +172,6 @@ function clicked() {
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     greyscale(imageData.data)
-    ctx.putImageData(imageData, 0, 0);
     contour(imageData.data);
     invert(imageData.data);
     ctx.putImageData(imageData, 0, 0);
