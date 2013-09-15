@@ -4,8 +4,10 @@ function print(x) {
 
 function init() {
     print("init()")
-    var video = document.querySelector("#webcam");
- 
+    video = document.getElementById("webcam");
+    var canvas = document.getElementById("capture");
+    ctx = canvas.getContext('2d');
+
     navigator.getUserMedia =
         navigator.getUserMedia 
         || navigator.webkitGetUserMedia 
@@ -37,3 +39,9 @@ function init() {
         print(e);
     }
 }
+
+function clicked() {
+    print("clicked!");
+    ctx.drawImage(video, 0, 0, 500, 375);
+}
+

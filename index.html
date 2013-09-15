@@ -7,7 +7,7 @@
             type="text/javascript"></script>
     <script type="text/javascript" src="js/init.js"></script>
     <style>
-#container {
+div.container {
     margin: 0px auto;
     width: 500px;
     height: 375px;
@@ -18,11 +18,30 @@
     height: 375px;
     background-color: #666;
 }
+#capture {
+    width: 500px;
+    height:375px;
+    background-color: #666;
+}
+
+div.columns {
+    -webkit-column-count: 2;
+    -webkit-column-gap: 10px;
+}
 </style>
   </head>
   <body>
-    <div id="container">
-      <video id="webcam" autoplay="true">webcam off</video>
+    <div class="columns">
+      <div class="container" onclick="clicked()">
+        <video id="webcam" autoplay="true">webcam off</video>
+      </div>
+      
+      <div class="container">
+        <canvas id="capture" width="500px" height="375px"> 
+      </div>
+    </div>
+    <div>
+      text
     </div>
   </body>
   <script type="text/javascript">
