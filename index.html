@@ -18,9 +18,8 @@ div.container {
     height: 375px;
     background-color: #666;
 }
-#capture {
-    width: 500px;
-    height:375px;
+
+#capture{
     background-color: #666;
 }
 
@@ -31,18 +30,23 @@ div.columns {
 </style>
   </head>
   <body>
+
     <div class="columns">
-      <div class="container" onclick="clicked()">
-        <video id="webcam" autoplay="true">webcam off</video>
-      </div>
-      
       <div class="container">
-        <canvas id="capture" width="500px" height="375px"> 
+        <video id="webcam" onclick="clicked()" autoplay="true">webcam off</video>
       </div>
-    </div>
-    <div>
-      text
-    </div>
+    
+      <div class="container">
+        <canvas id="capture" width="500" height="375"/>
+      </div>
+    </div>      
+    <canvas id="layer"
+            style="z-index: 1;
+                   position:absolute;
+                   left:582px;
+                   top:17px;"
+            width="500" height="375"/>
+    <button id="button" onclick="clicked()">capture</button>    
   </body>
   <script type="text/javascript">
     init();
