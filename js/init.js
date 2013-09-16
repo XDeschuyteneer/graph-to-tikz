@@ -5,6 +5,8 @@ function print(x) {
 function init() {
     video = document.getElementById("webcam");
     canvas = document.getElementById("capture");
+    canvas_a = document.getElementById("analyse");
+    ctx_a = canvas_a.getContext('2d');
     ctx = canvas.getContext('2d');
     output = document.getElementById("output");
 
@@ -46,13 +48,13 @@ function drawline(ctx, x1, y1, x2, y2) {
 }
 
 function circle(x, y, r) {
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = '#003300';
-    ctx.stroke();
+    ctx_a.beginPath();
+    ctx_a.arc(x, y, r, 0, 2 * Math.PI, false);
+    ctx_a.fillStyle = 'white';
+    ctx_a.fill();
+    ctx_a.lineWidth = 5;
+    ctx_a.strokeStyle = '#003300';
+    ctx_a.stroke();
 }
 
 function distance(x1, y1, x2, y2) {
@@ -143,12 +145,14 @@ function analyze(data) {
         maxLength = Math.max(n.length, maxLength)
     }
     output.innerHTML = "\\begin{tikzpicture}[shorten >=1pt,auto,node distance=3cm, thick]\n"
-    output.innerHTML += "\\tikzstyle\{main\}=\[circle,fill=blue\!20,draw,font=\\sffamily\\Large\\bfseries, minimum size=4mm\]";
+    output.innerHTML += "\\tikzstyle\{main\}=\[circle,fill=blue\!20,draw,font=\\sffamily\\Large\\bfseries, minimum size=4mm\]\n\n";
     var outputTxt = "";
     for (var i in nodes) {
         var n = nodes[i];
         circle(n.centerX, n.centerY, maxLength);
-        outputTxt += "\\node[main] (" + i + ") at (" + (n.centerX / 50) + ","+ (n.centerY / 50) + ") {" +  i + "};\n"
+        var x = parseFloat((n.centerX / 50).toFixed(1));
+        var y = parseFloat((n.centerY / 50).toFixed(1));
+        outputTxt += "\\node[main] (" + i + ") at (" + x + ","+ y + ") {" +  i + "};\n"
     }
     output.innerHTML += outputTxt;
     output.innerHTML += '\\end{tikzpicture}'
@@ -276,6 +280,10 @@ function clicked() {
     contour(imageData);
     //invert(imageData.data);
     ctx.putImageData(imageData, 0, 0);
-    analyze(imageData.data);
+    try {
+        analyze(imageData.data);
+    } catch (err) {
+        alert("Erreur lors de l'analyse, centez le dessin du graphe");
+    }
 }
 

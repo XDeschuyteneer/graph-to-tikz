@@ -27,6 +27,17 @@ div.columns {
     -webkit-column-count: 2;
     -webkit-column-gap: 10px;
 }
+
+#output {
+display:block;
+width:98.9%;
+height:98.5%;
+padding:0.5%;
+margin:0;
+border:1px solid #f0f040;
+background-color:#fffff0;
+overflow:auto;
+}
 </style>
   </head>
   <body>
@@ -39,10 +50,17 @@ div.columns {
       <div class="container">
         <canvas id="capture" width="500" height="375"/>
       </div>
-    </div>      
-    <textarea id="output">
-      output Here
-    </textarea>
+    </div>   
+    <div class="columns">
+      <div class="container">
+        <textarea id="output"> 
+        </textarea>
+      </div>
+
+      <div class="container">
+        <canvas id="analyse" width="500" height="375"/>
+      </div>
+    </div>
   </body>
   <script type="text/javascript">
     init();
