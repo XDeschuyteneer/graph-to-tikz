@@ -38,6 +38,7 @@ function init() {
         print("videoError():");
         print(e);
     }
+
 }
 
 function drawline(ctx, x1, y1, x2, y2) {
@@ -281,6 +282,7 @@ function clicked() {
     //invert(imageData.data);
     ctx.putImageData(imageData, 0, 0);
     try {
+        clear(canvas_a, ctx_a);
         analyze(imageData.data);
     } catch (err) {
         alert("Erreur lors de l'analyse, centez le dessin du graphe");
