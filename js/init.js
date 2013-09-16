@@ -3,7 +3,6 @@ function print(x) {
 }
 
 function init() {
-    print("init()")
     video = document.getElementById("webcam");
     canvas = document.getElementById("capture");
     ctx = canvas.getContext('2d');
@@ -20,11 +19,9 @@ function init() {
     
     if (navigator.getUserMedia) {       
         navigator.getUserMedia({video: true}, handleVideo, videoError);
-        print("    usermedia ok!")
     }
     
     function handleVideo(stream) {
-        print("handlevideo()");
         var source;
         if (window.webkitURL) {
 
@@ -38,7 +35,7 @@ function init() {
     }
     
     function videoError(e) {
-        print("videoError()");
+        print("videoError():");
         print(e);
     }
 }
@@ -50,20 +47,54 @@ function drawline(ctx, x1, y1, x2, y2) {
     ctx.stroke();
 }
 
+function circle(x, y, r) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#003300';
+    ctx.stroke();
+}
+
+
+
 function analyze(data) {
+    function isItPlain(x, y) {
+        var a1 = get(data, x, y)
+        var a2 = get(data, x - 1, y)
+        var a3 = get(data, x + 1, y)
+        var a4 = get(data, x, y - 1)
+        var a5 = get(data, x, y + 1)
+        var a6 = get(data, x - 1, y - 1)
+        var a7 = get(data, x + 1, y + 1)
+        var a8 = get(data, x - 1, y + 1)
+        var a9 = get(data, x + 1, y - 1)
+        return (data[a1] + data[a2] + data[a3] + data[a4] + data[a5]
+               + data[a6] + data[a7] + data[a8] + data[a9]) / 9 > 50 
+    }
     var deltaY = 10;
     var deltaX = 10;
     var epsilonNode = 100;
     var Y1 = 0;
     var Y2 = 0;
-    for (i = 0; i < canvas.height; i = i + deltaY) {
-        for (j = 0; j < canvas.width; j = j + deltaX) {
+    var plain = 0;
+    var empty = 0;
+    var total = 0;
+    for (y = 2; y < canvas.height; y = y + deltaY) {
+        for (x = 2; x < canvas.width; x = x + deltaX) {
+            total += 1;
             var length = 3
-            drawline(ctx1, j, i - length, j, i + length); 
-            
+            if (isItPlain(x, y)) {
+                plain += 1;
+            } else {
+                empty += 1;
+            }
         }
-        drawline(ctx1, 0, i, canvas1.width, i);
     }
+    // print(empty);
+    // print(plain);
+    // print(total);
 }
 
 function clear(canvas, ctx) {
@@ -118,29 +149,44 @@ function convolution(data, m, x, y) {
     return somme;
 }
 
-function contour(data) {
-    //var m1 = [[0, 1, 0], [1, -4, 1], [0, 1, 0]];
-    //var m2 = [[0, 1, 0], [1, -4, 1], [0, 1, 0]];
+function cloneTab(obj) {
+    var copy = new Uint8ClampedArray(obj.length);
+    for (var i = 0; i < obj.length; i++) {
+        copy[i] = obj[i];
+    }
+    return copy
+}
 
-    var m1 = [[0, 0, 0], [-1, 1, 0], [0, 0, 0]];
-    var m2 = [[0, 0, 0], [-1, 1, 0], [0, 0, 0]];
+function contour(imageData) {
 
-    //var m1 = [[1, 0, -1], [2, 0, -2], [1, 0, -1]];
-    //var m2 = [[1, 0, -1], [2, 0, -2], [1, 0, -1]];
+    var data = imageData.data
+    var data2 = cloneTab(data)
 
-    //sobel
-    //var m1 = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]];
-    //var m2 = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]];
+    //sobel transform
+    var m1 = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]];
+    var m2 = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]];
+
+    var a = 0;
+    var b = 0;
+    var c = 0;
+
     for (var y = 0; y < canvas.height; y++) {
         for (var x = 0; x < canvas.width; x++) {
             var id = get(data, x, y);
             var somme1 = convolution(data, m1, x, y);
             var somme2 = convolution(data, m2, x, y);
             var somme = Math.sqrt(somme1 * somme1 + somme2 * somme2);
-            data[id] = somme;
-            data[id + 1] = somme;
-            data[id + 2] = somme;
+            if (somme > 255) 
+                somme = 255
+            else if (somme < 0)
+                somme = 0
+            data2[id] = somme;
+            data2[id + 1] = somme;
+            data2[id + 2] = somme;
         }
+    }
+    for (var i in data2) {
+        imageData.data[i] = data2[i]
     }
 }
 
@@ -167,13 +213,12 @@ function invert(data) {
 }
 
 function clicked() {
-    print("clicked!");
     ctx.drawImage(video, 0, 0, 500, 375);
-    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
+    imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     greyscale(imageData.data)
-    contour(imageData.data);
-    invert(imageData.data);
+    contour(imageData);
+    //invert(imageData.data);
     ctx.putImageData(imageData, 0, 0);
+    //analyze(imageData.data);
 }
 
